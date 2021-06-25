@@ -19,7 +19,7 @@ namespace WillRobot.Bots
             {
                 if (member.Id != turnContext.Activity.Recipient.Id)
                 {
-                    await turnContext.SendActivityAsync(MessageFactory.Text("Welcome to AuthenticationBot. Type anything to get logged in. Type 'logout' to sign-out."), cancellationToken);
+                    await turnContext.SendActivityAsync(MessageFactory.Text("Bot de Autenticação. Digite algo para se logar. Digite 'logout' a qualquer momento para deslogar."), cancellationToken);
                 }
             }
         }
@@ -28,7 +28,6 @@ namespace WillRobot.Bots
         {
             _logger.LogInformation("Running dialog with Token Response Event Activity.");
 
-            // Run the Dialog with the new Token Response Event Activity.
             await _dialog.RunAsync(turnContext, _conversationState.CreateProperty<DialogState>(nameof(DialogState)), cancellationToken);
         }
     }

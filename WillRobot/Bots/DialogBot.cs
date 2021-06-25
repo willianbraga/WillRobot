@@ -32,8 +32,6 @@ namespace WillRobot.Bots
 
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Running dialog with Message Activity.");
-
             await _dialog.RunAsync(turnContext, _conversationState.CreateProperty<DialogState>(nameof(DialogState)), cancellationToken);
         }
     }

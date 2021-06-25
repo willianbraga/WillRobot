@@ -35,7 +35,7 @@ namespace EmptyBot
 
             services.AddSingleton<MainDialog>();
 
-            services.AddTransient<IBot, AuthBot<MainDialog>>();
+            services.AddTransient<IBot, StartBot>();
 
         }
 

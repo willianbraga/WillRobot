@@ -2,9 +2,6 @@
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Bot.Schema;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -50,7 +47,6 @@ namespace WillRobot.Dialogs
 
                 if (text == "logout")
                 {
-                    // The UserTokenClient encapsulates the authentication processes.
                     var userTokenClient = innerDc.Context.TurnState.Get<UserTokenClient>();
                     await userTokenClient.SignOutUserAsync(innerDc.Context.Activity.From.Id, _connectionName, innerDc.Context.Activity.ChannelId, cancellationToken).ConfigureAwait(false);
 
