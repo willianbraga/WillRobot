@@ -15,10 +15,8 @@ namespace WillRobot
         {
             OnTurnError = async (turnContext, exception) =>
             {
-                logger.LogError(exception, $"[OnTurnError] unhandled error : {exception.Message}");
-
-                await turnContext.SendActivityAsync("The bot encountered an error or bug.");
-                await turnContext.SendActivityAsync("To continue to run this bot, please fix the bot source code.");
+                await turnContext.SendActivityAsync("Foi encontrado um erro durante a execução do bot.");
+                await turnContext.SendActivityAsync("Por favor entre em contato com o administrador.");
 
                 if (conversationState != null)
                 {
@@ -27,9 +25,7 @@ namespace WillRobot
                         await conversationState.DeleteAsync(turnContext);
                     }
                     catch (Exception e)
-                    {
-                        logger.LogError(e, $"Exception caught on attempting to Delete ConversationState : {e.Message}");
-                    }
+                    { }
                 }
 
                 await turnContext.TraceActivityAsync("OnTurnError Trace", exception.Message, "https://www.botframework.com/schemas/error", "TurnError");

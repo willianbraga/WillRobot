@@ -15,30 +15,49 @@ namespace WillRobot.Dialogs
 {
     public class MainDialog : ComponentDialog
     {
-        protected readonly ILogger _logger;
+        protected readonly UserState _userState;
 
-        public MainDialog(ILogger<MainDialog> logger)
+        public MainDialog(UserState userState)
             : base(nameof(MainDialog))
         {
-            _logger = logger;
+            _userState = userState;
 
-            AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
-
-            AddDialog(new ConfirmPrompt(nameof(ConfirmPrompt)));
+            AddDialog(new TopLevelDialog());
 
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {
-                ChoiceCardStepAsync,
-                ShowCardStepAsync
+                InitialStepAsync,
+                FinalStepAsync,
+                //ChoiceCardStepAsync,
+                //ShowCardStepAsync
             }));
 
             InitialDialogId = nameof(WaterfallDialog);
         }
 
+        private async Task<DialogTurnResult> InitialStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        {
+            return await stepContext.BeginDialogAsync(nameof(TopLevelDialog), null, cancellationToken);
+        }
+
+        private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        {
+            var userInfo = (UserProfile)stepContext.Result;
+
+            string status = "Você selecionou para avaliar "
+                + (userInfo.CompaniesToReview.Count is 0 ? "nenhuma empresa" : string.Join(" e ", userInfo.CompaniesToReview))
+                + ".";
+
+            await stepContext.Context.SendActivityAsync(status);
+
+            var accessor = _userState.CreateProperty<UserProfile>(nameof(UserProfile));
+            await accessor.SetAsync(stepContext.Context, userInfo, cancellationToken);
+
+            return await stepContext.EndDialogAsync(null, cancellationToken);
+        }
+
         private async Task<DialogTurnResult> ChoiceCardStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("MainDialog.ChoiceCardStepAsync");
-
             var options = new PromptOptions()
             {
                 Prompt = MessageFactory.Text("Selecione uma opção do Menu:"),
@@ -70,56 +89,40 @@ namespace WillRobot.Dialogs
 
         private async Task<DialogTurnResult> ShowCardStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("MainDialog.ShowCardStepAsync");
-
-            // Cards are sent as Attachments in the Bot Framework.
-            // So we need to create a list of attachments for the reply activity.
             var attachments = new List<Attachment>();
 
-            // Reply to the activity we received with an activity.
             var reply = MessageFactory.Attachment(attachments);
 
-            // Decide which type of card(s) we are going to show the user
             switch (((FoundChoice)stepContext.Result).Value)
             {
                 case "Adaptive Card":
-                    // Display an Adaptive Card
                     reply.Attachments.Add(Cards.CreateAdaptiveCardAttachment());
                     break;
                 case "Animation Card":
-                    // Display an AnimationCard.
                     reply.Attachments.Add(Cards.GetAnimationCard().ToAttachment());
                     break;
                 case "Audio Card":
-                    // Display an AudioCard
                     reply.Attachments.Add(Cards.GetAudioCard().ToAttachment());
                     break;
                 case "Hero Card":
-                    // Display a HeroCard.
                     reply.Attachments.Add(Cards.GetHeroCard().ToAttachment());
                     break;
                 case "OAuth Card":
-                    // Display an OAuthCard
                     reply.Attachments.Add(Cards.GetOAuthCard().ToAttachment());
                     break;
                 case "Receipt Card":
-                    // Display a ReceiptCard.
                     reply.Attachments.Add(Cards.GetReceiptCard().ToAttachment());
                     break;
                 case "Signin Card":
-                    // Display a SignInCard.
                     reply.Attachments.Add(Cards.GetSigninCard().ToAttachment());
                     break;
                 case "Thumbnail Card":
-                    // Display a ThumbnailCard.
                     reply.Attachments.Add(Cards.GetThumbnailCard().ToAttachment());
                     break;
                 case "Video Card":
-                    // Display a VideoCard
                     reply.Attachments.Add(Cards.GetVideoCard().ToAttachment());
                     break;
                 default:
-                    // Display a carousel of all the rich card types.
                     reply.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                     reply.Attachments.Add(Cards.CreateAdaptiveCardAttachment());
                     reply.Attachments.Add(Cards.GetAnimationCard().ToAttachment());
@@ -133,10 +136,8 @@ namespace WillRobot.Dialogs
                     break;
             }
 
-            // Send the card(s) to the user as an attachment to the activity
             await stepContext.Context.SendActivityAsync(reply, cancellationToken);
 
-            // Give the user instructions about what to do next
             await stepContext.Context.SendActivityAsync(MessageFactory.Text("Digite algo para continuar e selecionar outra opção do Menu."), cancellationToken);
 
             return await stepContext.EndDialogAsync();

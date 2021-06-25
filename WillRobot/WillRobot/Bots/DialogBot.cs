@@ -24,6 +24,8 @@ namespace WillRobot.Bots
 
         public override async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default(CancellationToken))
         {
+            //Mensagens podem ser validadas aqui, verificar tipo de entrada '[Activity]'
+
             await base.OnTurnAsync(turnContext, cancellationToken);
 
             await _conversationState.SaveChangesAsync(turnContext, false, cancellationToken);
@@ -32,6 +34,8 @@ namespace WillRobot.Bots
 
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
+            //Mensagens podem ser validadas aqui, verificar tipo de entrada '[Activity]'
+
             await _dialog.RunAsync(turnContext, _conversationState.CreateProperty<DialogState>(nameof(DialogState)), cancellationToken);
         }
     }
