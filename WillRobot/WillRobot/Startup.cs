@@ -5,25 +5,38 @@ using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using WillRobot;
+using WillRobot.Bots;
+using WillRobot.Dialogs;
 
 namespace EmptyBot
 {
     public class Startup
     {
+        public IConfiguration _configuration { get; }
+
         public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
+            _configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers().AddNewtonsoftJson();
+            services.AddHttpClient().AddControllers().AddNewtonsoftJson();
 
-            services.AddSingleton<IBotFrameworkHttpAdapter, BotFrameworkHttpAdapter>();
+            services.AddSingleton<IBotFrameworkHttpAdapter, AdapterWithErrorHandler>();
 
-            services.AddTransient<IBot, EmptyBot>();
+            services.AddSingleton<IStorage, MemoryStorage>();
+
+            services.AddSingleton<UserState>();
+
+            services.AddSingleton<ConversationState>();
+
+            services.AddSingleton<MainDialog>();
+
+            services.AddTransient<IBot, StartBot>();
+
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -35,7 +48,6 @@ namespace EmptyBot
 
             app.UseDefaultFiles()
                 .UseStaticFiles()
-                .UseWebSockets()
                 .UseRouting()
                 .UseAuthorization()
                 .UseEndpoints(endpoints =>
