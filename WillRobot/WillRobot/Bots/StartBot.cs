@@ -20,9 +20,9 @@ namespace WillRobot.Bots
             {
                 if (member.Id != turnContext.Activity.Recipient.Id)
                 {
-                    var reply = MessageFactory.Text("Welcome to CardBot."
-                        + " This bot will show you different types of Rich Cards."
-                        + " Please type anything to get started.");
+                    var reply = MessageFactory.Text("Olá, sou o WillRobot."
+                        + " Fui criado para testes."
+                        + " Por favor digite algo para iniciar.");
 
                     await turnContext.SendActivityAsync(reply, cancellationToken);
                 }

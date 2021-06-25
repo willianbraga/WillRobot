@@ -41,8 +41,8 @@ namespace WillRobot.Dialogs
 
             var options = new PromptOptions()
             {
-                Prompt = MessageFactory.Text("What card would you like to see? You can click or type the card name"),
-                RetryPrompt = MessageFactory.Text("That was not a valid choice, please select a card or number from 1 to 9."),
+                Prompt = MessageFactory.Text("Selecione uma opção do Menu:"),
+                RetryPrompt = MessageFactory.Text("Opção informada invalida, por favor informe uma opção invalida."),
                 Choices = GetChoices(),
             };
 
@@ -137,7 +137,7 @@ namespace WillRobot.Dialogs
             await stepContext.Context.SendActivityAsync(reply, cancellationToken);
 
             // Give the user instructions about what to do next
-            await stepContext.Context.SendActivityAsync(MessageFactory.Text("Type anything to see another card."), cancellationToken);
+            await stepContext.Context.SendActivityAsync(MessageFactory.Text("Digite algo para continuar e selecionar outra opção do Menu."), cancellationToken);
 
             return await stepContext.EndDialogAsync();
         }
